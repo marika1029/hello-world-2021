@@ -27,7 +27,7 @@ std::vector<int> serad()
     do
     {
         pocitadlo = 0;
-        for (int i=0; i < muj_vektor.size(); ++i)
+        for (int i=0; i < muj_vektor.size() -1; ++i)
         {
             if (muj_vektor[i] > muj_vektor[i+1])
             {
