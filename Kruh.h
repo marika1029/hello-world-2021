@@ -1,25 +1,29 @@
 #ifndef KRUH_H
 #define KRUH_H
 
+#include "Tvar.h"
 
-class Kruh
+
+class Kruh : public Tvar
 {
     public:
-        Kruh(); //Konstruktor (volam: Kruh r = Kruh...)
+        Kruh();
         Kruh(double r_in, double x_in, double y_in);
-        virtual ~Kruh(); //Destruktor (vola se automaticky)
-        //void posun(double xp, double yp); //metoda co posune souradnice o (xp,yp) - zadny vystup
-        //void vypisnaobrazovku() const; //const znamena ze objekt se nezmeni
+
         void vypisInfo() const;
-        double obsah() const;
+        //virtual double obsah() const;
         double obvod() const;
-        double leziUvnitr(double xa, double ya)  const;
+        virtual bool leziUvnitr(double xxa, double yya)  const;
+
+        virtual double x_min() const {return x - r;};
+        virtual double x_max() const {return x + r;};
+        virtual double y_min() const {return y - r;};
+        virtual double y_max() const {return y + r;};
 
     protected:
 
     private:
-        double r,x,y; //data se kterymi uzivatel nemuze pracovat
-
+        double r,x,y;
 };
 
 #endif // KRUH_H

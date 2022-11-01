@@ -1,69 +1,45 @@
 #include <iostream>
-#include <vector>
-#include <fstream>
-#include <string>
-#include <list>
-#include <chrono>
+#include <memory>
+#include "Tvar.h"
+#include "Kruh.h"
+//#include "Kyticka.h"
+//#include "Srdce.h"
 
-using namespace std::chrono;
-
-std::list<int> nacti_list()
+int main()
 {
+    // Toto je smart pointer
+    // Funguje podobne jako ukazatel (Tvar*), ale nemusime se starat o dealokaci
+    // Diky polymorfismu muze ukazovat take na jakykoli objekt, jehoz trida je odvozena od tridy Tvar
+    std::shared_ptr<Tvar> utvar;
 
-    std::ifstream soubor("data.txt");
+    int utvar_id;
+    std::cout << "Vyberte druh utvaru (1 - kruh, 2 - kyticka, 3 - srdce): " << std::endl;
+    std::cin >> utvar_id;
 
-    std::list<int> muj_list (10000);
-
-    for(std::list<int>::iterator it = muj_list.begin(); it != muj_list.end(); it++) {
-        soubor >> *it;
-
+    // Podle uzivatelskeho zadani vytvorime vybrany objekt a nasmerujeme na nej ukazatel
+    // K tomu slouzi funkce make_shared, jeji parametry budou stejne jako u konstruktoru naseho objektu
+    if (utvar_id == 1) {
+        utvar = std::make_shared<Kruh>(1.0,0.0,0.0);
+    }
+//    else if (utvar_id == 2) {
+//        utvar = std::make_shared<Kyticka>(1.0,4.0,0.0,0.0);
+//    }
+//    else if (utvar_id == 3) {
+//        utvar = std::make_shared<Srdce>(0.0,0.0);
+//    }
+    else {
+	std::cout << "Neznamy tvar.\n";
+	return 1;
     }
 
-    return muj_list;
-}
+    // Nyni vypocitame obsah utvaru
+    // Podle toho, ktere tridy je dany objekt se bud pouzije vypocet vzoreckem (trida Kruh)
+    // anebo vypocet pomoci numericke integrace (Kyticka, Srdce)
+    double obsah = utvar->obsah(); // Pri predavani objektu musime ukazatel dereferencovat operatorem *
+                               // Jinak by se prekladac snazil predat funkci pouze
+                               // ciselnou hodnotu adresy v pameti
 
+    std::cout << "Obsah utvaru je " << obsah << std::endl;
 
-std::vector<int> seradto()
-{
-    std::vector<int> serazeny_list (10000);
-    std::list<int> muj_list = nacti_list();
-    for(std::list<int>::iterator it = muj_list.begin(); it != muj_list.end(); it++) {
-        int pocet = 0;
-        for(std::list<int>::iterator it2 = muj_list.begin(); it2 != muj_list.end(); it2++) {
-            if (*it > *it2) {
-                ++pocet;
-            }
-        }
-        serazeny_list[pocet]=*it;
-    }
-    for (int i=0; i < serazeny_list.size(); ++i) {
-       if (serazeny_list[i] == 0) {
-            serazeny_list[i] = serazeny_list[i-1];
-       }
-    }
-
-    return serazeny_list;
-}
-
-int main() {
-
-
-    std::list<int> muj_list = nacti_list();
-
-    auto start = high_resolution_clock::now();
-
-    std::vector<int> muj_vektor = seradto();
-
-    auto stop = high_resolution_clock::now();
-    auto duration = duration_cast<microseconds>(stop - start);
-
-    std::cout    << "Cas funkce:"
-            << duration.count() << " miktosekund" <<std::endl;
-
-    std::ofstream uloz("serazeno.txt");
-        for (int i=0; i < muj_vektor.size(); ++i) {
-            uloz << muj_vektor[i] << std::endl;
-        }
-
-return 0;
+    return 0;
 }
