@@ -1,69 +1,154 @@
 #include <iostream>
-#include <vector>
 #include <fstream>
-#include <string>
-#include <list>
-#include <chrono>
+#include <vector>
+#include "Uzivatel.h"
+#include <algorithm>
 
-using namespace std::chrono;
+using namespace std;
 
-std::list<int> nacti_list()
+vector<Uzivatel> nacti(vector<Uzivatel> uzivatele)
 {
+cout << "Zadej jmeno: ";
+    string jmeno;
+    cin >> jmeno;
+    cout << "Jmeno je " << jmeno << "\n";
 
-    std::ifstream soubor("data.txt");
+cout << "Zadej prijmeni: ";
+    string prijmeni;
+    cin >> prijmeni;
+    cout << "Prijmeni je " << prijmeni << "\n";
 
-    std::list<int> muj_list (10000);
+cout << "Zadej vek: ";
+    int vek;
+    cin >> vek;
 
-    for(std::list<int>::iterator it = muj_list.begin(); it != muj_list.end(); it++) {
-        soubor >> *it;
+    do
+    {
+        if(vek<0)
+        {
+            cout << "Tak to jsi se jeste nenarodil.\n";
+            cout << "Zkus to znovu: ";
+            cin >> vek;
+        }
+        else if (vek>120)
+        {
+            cout << "Gratuluji k rekordu.\n";
+            cout << "Zkus to znova: ";
+            cin >> vek;
+        }
+        else
+        {
+            cout << "Vas vek je " << vek << "\n";
+        }
+    }while(vek>120||vek<0);
 
-    }
+cout << "Zadej vysku v cm: ";
+    float vyska;
+    cin >> vyska;
 
-    return muj_list;
+    do{
+        if(vyska < 100)
+        {
+            cout << "Tak to jsi mensi nez ja.\n";
+            cout << "Zkus to znovu: ";
+            cin >> vyska;
+        }
+        else if (vyska>250)
+        {
+            cout << "Gratuluji k rekordu bez hrat basketball.\n";
+            cout << "Zkus to znova: ";
+            cin >> vyska;
+        }
+        else
+        {
+            cout << "Vase vyska je " << vyska << "\n";
+        }
+    }while(vyska > 250||vyska<100);
+
+cout << "Zadejte dosazene vzdelani (zs=0, ss=1, vs=2): ";
+    int vzdelani;
+    cin >> vzdelani;
+
+    do
+    {
+        if(vzdelani == 0)
+        {
+            cout << "Vase vzdelani je zakladni.\n";
+        }
+        else if (vzdelani == 1)
+        {
+            cout << "Vase vzdelani je stredoskolske.\n";
+        }
+        else if (vzdelani == 2)
+        {
+            cout << "Vase vzdelani je vysokoskolske.\n";
+        }
+        else
+        {
+            cout << "Zadane vzdelani je naplatne, asi jste martan.\n";
+            cout << "Zadejte novy udaj: ";
+            cin >> vzdelani;
+        }
+    }while(vzdelani>2||vzdelani<0);
+
+    uzivatele.push_back(Uzivatel(prijmeni,jmeno,vek,vyska,vzdelani));
+
+    return uzivatele;
+
 }
 
-
-std::vector<int> seradto()
+void ukladani(vector<Uzivatel> uzivatele)
 {
-    std::vector<int> serazeny_list (10000);
-    std::list<int> muj_list = nacti_list();
-    for(std::list<int>::iterator it = muj_list.begin(); it != muj_list.end(); it++) {
-        int pocet = 0;
-        for(std::list<int>::iterator it2 = muj_list.begin(); it2 != muj_list.end(); it2++) {
-            if (*it > *it2) {
-                ++pocet;
-            }
-        }
-        serazeny_list[pocet]=*it;
-    }
-    for (int i=0; i < serazeny_list.size(); ++i) {
-       if (serazeny_list[i] == 0) {
-            serazeny_list[i] = serazeny_list[i-1];
-       }
-    }
+    ofstream ulozTo ("users.txt");
 
-    return serazeny_list;
+    for(Uzivatel k : uzivatele)
+    {
+        ulozTo << k.prijm();
+        ulozTo << " ";
+        ulozTo << k.jme();
+        ulozTo << " ";
+        ulozTo << k.ve();
+        ulozTo << " ";
+        ulozTo << k.vysk();
+        ulozTo << " ";
+        ulozTo << k.vzde();
+        ulozTo << "\n";
+    }
+    return;
 }
 
-int main() {
+struct Trideni
+{
+    bool operator()(class Uzivatel& a1 , class Uzivatel& a2) const
+    {
+        return a1.prijm() < a2.prijm();
+    }
 
+};
 
-    std::list<int> muj_list = nacti_list();
+vector<Uzivatel> serazeno(vector<Uzivatel> a)
+{
+    sort(a.begin(),a.end(), Trideni());
+    return a;
+}
 
-    auto start = high_resolution_clock::now();
+int main()
+{
+    int u;
+    vector<Uzivatel> uzivatele;
 
-    std::vector<int> muj_vektor = seradto();
+    do
+    {
+        u = 0;
+        uzivatele = nacti(uzivatele);
+        cout << "Pokud chcete nacist dalsiho uzivatele napiste 1: ";
+        cin >> u;
+    }while(u==1);
 
-    auto stop = high_resolution_clock::now();
-    auto duration = duration_cast<microseconds>(stop - start);
+    vector<Uzivatel> uzivatele2;
+    uzivatele2 = serazeno(uzivatele);
 
-    std::cout    << "Cas funkce:"
-            << duration.count() << " miktosekund" <<std::endl;
-
-    std::ofstream uloz("serazeno.txt");
-        for (int i=0; i < muj_vektor.size(); ++i) {
-            uloz << muj_vektor[i] << std::endl;
-        }
+    ukladani(uzivatele2);
 
 return 0;
 }
