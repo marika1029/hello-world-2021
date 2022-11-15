@@ -6,7 +6,7 @@
 
 using namespace std;
 
-class Uzivatel : public vector <Uzivatel>
+class Uzivatel
 
 {
     public:
